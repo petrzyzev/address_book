@@ -1,20 +1,20 @@
+# frozen_string_literal: true
+
 class AddressesController < ApplicationController
-  before_action :set_address, only: [:show, :edit, :update, :destroy]
+  before_action :set_address, only: %i[show edit update destroy]
 
   # GET /addresses
   # GET /addresses.json
   def index
-    @page_size = AddressExtractor::PAGE_SIZE
-    @addresses = address_extractor.records
-    @previous_page_cursor = address_extractor.previous_page_cursor
-    p @addresses
-    p @previous_page_cursor
+    pagination_params = Address.paginate(params[:cursor])
+    @records = pagination_params[:records]
+    @previous_cursor = pagination_params[:previous_cursor]
+    @next_cursor = pagination_params[:next_cursor]
   end
 
   # GET /addresses/1
   # GET /addresses/1.json
-  def show
-  end
+  def show; end
 
   # GET /addresses/new
   def new
@@ -22,8 +22,7 @@ class AddressesController < ApplicationController
   end
 
   # GET /addresses/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /addresses
   # POST /addresses.json
@@ -66,17 +65,14 @@ class AddressesController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_address
-      @address = Address.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def address_params
-      params.require(:address).permit(:name, :surname, :address, :phone)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_address
+    @address = Address.find(params[:id])
+  end
 
-    def address_extractor
-      @address_extractor ||= AddressExtractor.new(params[:cursor])
-    end
+  # Only allow a list of trusted parameters through.
+  def address_params
+    params.require(:address).permit(:name, :surname, :address, :phone)
+  end
 end

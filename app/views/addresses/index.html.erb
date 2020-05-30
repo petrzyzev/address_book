@@ -14,25 +14,25 @@
   </thead>
 
   <tbody>
-    <% @addresses.each do |address| %>
+    <% @records.each do |record| %>
       <tr>
-        <td><%= address.name %></td>
-        <td><%= address.surname %></td>
-        <td><%= address.address %></td>
-        <td><%= address.phone %></td>
-        <td><%= link_to 'Show', address %></td>
-        <td><%= link_to 'Edit', edit_address_path(address) %></td>
-        <td><%= link_to 'Destroy', address, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= record.name %></td>
+        <td><%= record.surname %></td>
+        <td><%= record.address %></td>
+        <td><%= record.phone %></td>
+        <td><%= link_to 'Show', record %></td>
+        <td><%= link_to 'Edit', edit_address_path(record) %></td>
+        <td><%= link_to 'Destroy', record, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
 <div>
-  <% unless @addresses.size < @page_size%>
-    <%= link_to "Next Page", addresses_path(cursor: @addresses.last) %>
+  <% if @previous_cursor %>
+    <%= link_to "Previous Page", addresses_path(cursor: @previous_cursor) %>
   <% end %>
-  <% if @previous_page_cursor %>
-    <%= link_to "Previous Page", addresses_path(cursor: @previous_page_cursor) %>
+  <% if @next_cursor%>
+    <%= link_to "Next Page", addresses_path(cursor: @next_cursor) %>
   <% end %>
 </div>
 <br>
