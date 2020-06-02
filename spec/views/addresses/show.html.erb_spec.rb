@@ -1,16 +1,14 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-RSpec.describe "addresses/show", type: :view do
+RSpec.describe 'addresses/show', type: :view do
   before(:each) do
-    @address = assign(:address, Address.create!(
-      name: "Name",
-      surname: "Surname",
-      address: "Address",
-      phone: "Phone"
-    ))
+    address = FactoryBot.create(:address)
+    @address = assign(:address, address)
   end
 
-  it "renders attributes in <p>" do
+  it 'renders attributes in <p>' do
     render
     expect(rendered).to match(/Name/)
     expect(rendered).to match(/Surname/)

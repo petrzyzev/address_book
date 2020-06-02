@@ -1,24 +1,13 @@
-# README
+# Address Book
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Application for recording and viewing people's addresses
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+## Usage
+### Setup & Start
+- `bundle install` - install dependencies
+- `rails db:setup` - create databases 
+- `rails db:migrate` - start migration
+- `rails db:seed` - seeding
+- `rails s` - start server. Then you can visit `localhost:3000`
+### Testing
+- `bundle exec rspec` - run tests

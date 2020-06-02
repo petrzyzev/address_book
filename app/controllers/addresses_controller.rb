@@ -4,16 +4,14 @@ class AddressesController < ApplicationController
   before_action :set_address, only: %i[show edit update destroy]
 
   # GET /addresses
-  # GET /addresses.json
   def index
     pagination_params = Address.paginate(params[:cursor])
-    @records = pagination_params[:records]
+    @addresses = pagination_params[:records]
     @previous_cursor = pagination_params[:previous_cursor]
     @next_cursor = pagination_params[:next_cursor]
   end
 
-  # GET /addresses/1
-  # GET /addresses/1.json
+  # GET /addresses/:id
   def show; end
 
   # GET /addresses/new
@@ -21,11 +19,10 @@ class AddressesController < ApplicationController
     @address = Address.new
   end
 
-  # GET /addresses/1/edit
+  # GET /addresses/:id/edit
   def edit; end
 
   # POST /addresses
-  # POST /addresses.json
   def create
     @address = Address.new(address_params)
 
@@ -40,8 +37,7 @@ class AddressesController < ApplicationController
     end
   end
 
-  # PATCH/PUT /addresses/1
-  # PATCH/PUT /addresses/1.json
+  # PATCH/PUT /addresses/:id
   def update
     respond_to do |format|
       if @address.update(address_params)
@@ -54,8 +50,7 @@ class AddressesController < ApplicationController
     end
   end
 
-  # DELETE /addresses/1
-  # DELETE /addresses/1.json
+  # DELETE /addresses/:id
   def destroy
     @address.destroy
     respond_to do |format|
