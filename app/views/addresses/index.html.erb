@@ -28,12 +28,8 @@
   </tbody>
 </table>
 <div>
-  <% if @previous_cursor %>
-    <%= link_to "Previous Page", addresses_path(cursor: @previous_cursor) %>
-  <% end %>
-  <% if @next_cursor%>
-    <%= link_to "Next Page", addresses_path(cursor: @next_cursor) %>
-  <% end %>
+  <%= link_to "Previous Page", addresses_path(cursor: @addresses.first.id, page: 'previous') %>
+  <%= link_to "Next Page", addresses_path(cursor: @addresses.last.id, page: 'next') %>
 </div>
 <br>
 

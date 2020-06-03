@@ -3,70 +3,81 @@
 require 'rails_helper'
 
 RSpec.describe Address, type: :model do
+  subject { described_class.paginate(cursor, page, page_size) }
+
   before(:all) { FactoryBot.create_list(:address, 12) }
 
-  subject { described_class.paginate(cursor, page_size) }
-
-  let(:cursor) { first_page_cursor }
+  let(:cursor) { first_page_prev_cursor }
   let(:page_size) { 5 }
-  let(:first_page_cursor) { described_class.order(created_at: :desc).first.id }
-  let(:second_page_cursor) do
-    described_class.order(created_at: :desc).offset(page_size).first.id
+  let(:page) { 'next' }
+
+  let(:first_page_prev_cursor) do
+    described_class.order(created_at: :desc).limit(page_size).first.id
   end
-  let(:last_page_cursor) do
-    described_class.order(created_at: :desc).offset(page_size * 2).first.id
+
+  let(:second_page) do
+    described_class.order(created_at: :desc).offset(page_size).limit(page_size)
   end
-  let(:records) { subject[:records] }
-  let(:next_cursor) { subject[:next_cursor] }
-  let(:previous_cursor) { subject[:previous_cursor] }
+  let(:second_page_next_cursor) { second_page.last.id }
+  let(:second_page_prev_cursor) { second_page.first.id }
+
+  let(:last_page) do
+    described_class.order(created_at: :desc).offset(page_size * 2).limit(page_size)
+  end
+  let(:last_page_next_cursor) { last_page.last.id }
+  let(:last_page_prev_cursor) { last_page.first.id }
+
+  let(:records) { subject }
 
   context 'when cursor is nil' do
     let(:cursor) { nil }
 
     it 'returns records from first page' do
       expect(records.size).to eq(page_size)
-      expect(records.first.id).to eq(first_page_cursor)
-      expect(previous_cursor).to be_nil
-      expect(next_cursor).to eq(second_page_cursor)
-    end
-  end
-
-  context 'when page_size is nil' do
-    let(:page_size) { nil }
-
-    it 'show 5 records by default' do
-      expect(records.size).to eq(5)
+      expect(records.first.id).to eq(first_page_prev_cursor)
     end
   end
 
   context 'when cursor on first page' do
-    it 'returns records from second page' do
-      expect(records.size).to eq(page_size)
-      expect(records.first.id).to eq(first_page_cursor)
-      expect(previous_cursor).to be_nil
-      expect(next_cursor).to eq(second_page_cursor)
+    context 'when prev page' do
+      let(:cursor) { first_page_prev_cursor }
+      let(:page) { 'previous' }
+
+      it 'raise EndOfListError' do
+        expect { records }.to raise_error(EndOfListError)
+      end
     end
   end
 
   context 'when cursor on second page' do
-    let(:cursor) { second_page_cursor }
+    context 'when next page' do
+      let(:cursor) { second_page_next_cursor }
 
-    it 'returns records from second page' do
-      expect(records.size).to eq(page_size)
-      expect(records.first.id).to eq(second_page_cursor)
-      expect(previous_cursor).to eq(first_page_cursor)
-      expect(next_cursor).to eq(last_page_cursor)
+      it 'returns records from last page' do
+        expect(records.size).to eq(2)
+        expect(records.first.id).to eq(last_page_prev_cursor)
+      end
+    end
+
+    context 'when prev page' do
+      let(:cursor) { second_page_prev_cursor }
+      let(:page) { 'previous' }
+
+      it 'returns records from prev page' do
+        expect(records.size).to eq(page_size)
+        expect(records.first.id).to eq(first_page_prev_cursor)
+      end
     end
   end
 
   context 'when cursor on last page' do
-    let(:cursor) { last_page_cursor }
+    context 'when next page' do
+      let(:cursor) { last_page_next_cursor }
+      let(:page) { 'next' }
 
-    it 'returns records from last page' do
-      expect(records.size).to eq(2)
-      expect(records.first.id).to eq(last_page_cursor)
-      expect(previous_cursor).to eq(second_page_cursor)
-      expect(next_cursor).to be_nil
+      it 'raise EndOfListError' do
+        expect { records }.to raise_error(EndOfListError)
+      end
     end
   end
 
@@ -75,9 +86,7 @@ RSpec.describe Address, type: :model do
       let(:cursor) { -1 }
 
       it 'returns empty array of records' do
-        expect(records.size).to eq(0)
-        expect(previous_cursor).to be_nil
-        expect(next_cursor).to be_nil
+        expect { records }.to raise_error(EndOfListError)
       end
     end
 
@@ -86,9 +95,7 @@ RSpec.describe Address, type: :model do
 
       it 'returns records from first page' do
         expect(records.size).to eq(page_size)
-        expect(records.first.id).to eq(first_page_cursor)
-        expect(previous_cursor).to be_nil
-        expect(next_cursor).to eq(second_page_cursor)
+        expect(records.first.id).to eq(first_page_prev_cursor)
       end
     end
 
@@ -96,7 +103,7 @@ RSpec.describe Address, type: :model do
       let(:cursor) { :wrong }
 
       it 'raise error' do
-        expect { subject }.to raise_error(ActiveRecord::StatementInvalid)
+        expect { records }.to raise_error(ActiveRecord::StatementInvalid)
       end
     end
   end

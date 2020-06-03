@@ -5,10 +5,9 @@ class AddressesController < ApplicationController
 
   # GET /addresses
   def index
-    pagination_params = Address.paginate(params[:cursor])
-    @addresses = pagination_params[:records]
-    @previous_cursor = pagination_params[:previous_cursor]
-    @next_cursor = pagination_params[:next_cursor]
+    @addresses = Address.paginate(params[:cursor], params[:page])
+  rescue EndOfListError
+    head :no_content
   end
 
   # GET /addresses/:id
